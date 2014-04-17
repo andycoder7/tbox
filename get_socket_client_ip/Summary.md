@@ -48,12 +48,8 @@ Get Client IP from Socket
 ###答案和零碎
 
 ---
-- getsockname()函数是用于获取一个socketfd所bind的IP和PORT，也就是我第一个想法的解决方案
+- 额，好吧，其实答案我还没完全搞清楚，等我搞清楚了再来吧答案补上哈:)
 - 如果大家在运行[我的test](test.c)的程序，发现sock server输出是0.0.0.0。怎么回事？是程序有问题么？其实不是的，我们都知道，在socket服务器程序中，我们一般会bind本机IP，但是，由于一般本机IP不确定，或者会变，所以，一般bind本机IP都不直接写IP，而是使用宏`INADDR_ANY`，这个宏是什么呢？通过 `sudo grep -R "INADDR_ANY" /usr/include/` 我们可以找到这个宏其实就是0.0.0.0
-- getpeername()函数是用于获取连上这个socketfd的socketfd的IP和PORT，中文说的好奇怪的感觉。。我英语翻译水平果然很烂，原文是：
-
->getpeername()  returns the address of the peer connected to the socket sockfd, in the buffer pointed to by addr.
-
 - 千万不要以为自己都懂了，有可能你不知道的还有很多。
 
 *Andy(andy.at.working@gmail.com) 2014-04-17*

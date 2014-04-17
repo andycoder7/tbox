@@ -41,13 +41,26 @@ int main()
 
 	//已经可以拿到client的addr了，下面的代码纯粹是我无聊，测试一下两个函数的区别
 	//这里在编译的时候会有一个警告，关于int转char*的，无视之
-	getsockname(client, (struct sockaddr *) &addr, &len);
+	int ret = 0;
+
+	bzero((char*)&addr, sizeof(addr));
+	ret = getsockname(client, (struct sockaddr *) &addr, &len);
+	printf("result of getting name: %d\n", ret);
 	printf("sock client: %s\n", inet_ntoa(addr.sin_addr));
-	getsockname(fd, (struct sockaddr *) &addr, &len);
+
+	bzero((char*)&addr, sizeof(addr));
+	ret = getsockname(fd, (struct sockaddr *) &addr, &len);
+	printf("result of getting name: %d\n", ret);
 	printf("sock server: %s\n", inet_ntoa(addr.sin_addr));
-	getpeername(client, (struct sockaddr *) &addr, &len);
+
+	bzero((char*)&addr, sizeof(addr));
+	ret = getpeername(client, (struct sockaddr *) &addr, &len);
+	printf("result of getting name: %d\n", ret);
 	printf("peer client: %s\n", inet_ntoa(addr.sin_addr));
-	getpeername(fd, (struct sockaddr *) &addr, &len);
+	
+	bzero((char*)&addr, sizeof(addr));
+	ret = getpeername(fd, (struct sockaddr *) &addr, &len);
+	printf("result of getting name: %d\n", ret);
 	printf("peer server: %s\n", inet_ntoa(addr.sin_addr));
 
     char buff[256] = {'\0'};//just for pause
