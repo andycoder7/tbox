@@ -16,6 +16,11 @@ struct line {
 
 int main()
 {
+	//这test的是零长数组的大小问题
+	int num[0];
+	printf("size of num: %d\n", sizeof(num));
+	printf("address of num: %d\n", num);
+
 	//这test的是对齐问题
 	test c = {.c1 = 1, .c2 = 2, .c3 = 3};
 	printf("address of c: %d\n", &c);
