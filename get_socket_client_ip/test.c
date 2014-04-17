@@ -37,14 +37,18 @@ int main()
 
 	bzero((char*)&addr, sizeof(addr));
 	int client = accept(fd, (struct sockaddr *) &addr, &len);
+	printf("%s\n", inet_ntoa(addr.sin_addr));
 
 	//已经可以拿到client的addr了，下面的代码纯粹是我无聊，测试一下两个函数的区别
 	//这里在编译的时候会有一个警告，关于int转char*的，无视之
-	printf("%s\n", inet_ntoa(addr.sin_addr));
 	getsockname(client, (struct sockaddr *) &addr, &len);
-	printf("%s\n", inet_ntoa(addr.sin_addr));
+	printf("sock client: %s\n", inet_ntoa(addr.sin_addr));
+	getsockname(fd, (struct sockaddr *) &addr, &len);
+	printf("sock server: %s\n", inet_ntoa(addr.sin_addr));
 	getpeername(client, (struct sockaddr *) &addr, &len);
-	printf("%s\n", inet_ntoa(addr.sin_addr));
+	printf("peer client: %s\n", inet_ntoa(addr.sin_addr));
+	getpeername(fd, (struct sockaddr *) &addr, &len);
+	printf("peer server: %s\n", inet_ntoa(addr.sin_addr));
 
     char buff[256] = {'\0'};//just for pause
 	read(client, &buff, 256);
