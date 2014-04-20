@@ -15,23 +15,22 @@ void getlocalhostip()
 	int  MAXINTERFACES=16;
 	long ip;
 	int fd, intrface, retn = 0;
-	struct ifreq buf[MAXINTERFACES]; ///if.h
-	struct ifconf ifc; ///if.h
+	struct ifreq buf[MAXINTERFACES]; //if.h
+	struct ifconf ifc;				 //if.h
 	ip = -1;
 	if ((fd = socket (AF_INET, SOCK_DGRAM, 0)) >= 0) {
-		ifc.ifc_len = sizeof buf;
+		ifc.ifc_len = sizeof(buf);
 		ifc.ifc_buf = (caddr_t) buf;
 		if (!ioctl (fd, SIOCGIFCONF, (char *) &ifc)) {
 			intrface = ifc.ifc_len / sizeof (struct ifreq); 
 			printf("interface: %d\n\n", intrface);
 			while (intrface-- > 0) 	{
-				if (!(ioctl (fd, SIOCGIFADDR, (char *) &buf[intrface]))) {
-					struct in_addr ip = {0};
-					ip=((struct sockaddr_in *)(&buf[intrface].ifr_addr))->sin_addr;
-					printf("IP: %10x\n", ip);
-					printf("%s : %s \n\n", buf[intrface].ifr_name,inet_ntoa(ip));
-					continue;
-				}
+				struct ifreq *ip = 0;
+				struct sockaddr_in *ip_addr = 0;
+				ip = ifc.ifc_req + intrface;
+				printf("ifreq 的地址是: %x\n", ip);
+				ip_addr = (struct sockaddr_in *)&(ip->ifr_addr);
+				printf("%s : %s\n", ip->ifr_name, inet_ntoa(ip_addr->sin_addr));
 			}
 		}
 		close (fd);
@@ -40,7 +39,9 @@ void getlocalhostip()
 
 int main(int argc, char **argv)
 {
-	//WARNING! 本程序有刷屏级别的警告,无视之~
+	//                  ------------------
+	//WARNING! 本程序有 | 刷屏级别的警告 |,无视之~
+	//                  ------------------
     char *ip = 0;
 	long ret = 0;
 	int r = 0;

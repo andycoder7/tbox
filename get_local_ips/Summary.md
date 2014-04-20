@@ -9,6 +9,56 @@ Get Local IP Information by SIOCFIGCONF
 ###收获
 我主要参考的是这篇[文章](http://zhumeng8337797.blog.163.com/blog/static/1007689142012311082638/),很长..相当长...但是其实是把一样的内容重复了好几遍,我把链接放在这里只是因为我真的是看的它...
 
+相关test代码,老习惯,我还是放在了[本目录下的test.c](test.c)中.ioctl没什么好讲的,这个神器大家都懂得~,总的来说,主要是两个结构体:`ifreq`和`ifconf`,他们都是在/usr/include/linux/if.h中定义的,额,反正在我的系统(ubuntu14.04)里是在这个位置的...下面是我节选出来的两个结构体的定义
+
+struct ifreq:
+
+    struct ifreq {
+    #define IFHWADDRLEN	6
+		union
+		{
+			char	ifrn_name[IFNAMSIZ];		/* if name, e.g. "en0" */
+		} ifr_ifrn;
+
+		union {
+			struct	sockaddr ifru_addr;
+			...
+		} ifr_ifru;
+	};
+
+    #define ifr_name	ifr_ifrn.ifrn_name	/* interface name	*/
+    #define	ifr_addr	ifr_ifru.ifru_addr	/* address		*/
+    ...
+
+从机构体中可以看出,ifreq包括interface(if是指interface,你不会不知道吧^.^)的name和IP,当然因为是个union,它也可以用来表示和存储其他信息,不过我们这里只用到了ifru_addr.所以,简而言之,这个结构体就是用来存储接口的相关信息的.(至于什么是接口,额...这个么..就是比如说你在ifconfig时看到的eth0或者wlan0什么的,对就是那货~)
+    
+struct ifconf:
+
+    struct ifconf  {
+    	int	ifc_len;			/* size of buffer	*/
+    	union {
+    		char *ifcu_buf;
+    		struct ifreq *ifcu_req;
+    	} ifc_ifcu;
+    };
+    #define	ifc_buf	ifc_ifcu.ifcu_buf		/* buffer address	*/
+    #define	ifc_req	ifc_ifcu.ifcu_req		/* array of structures	*/
+    
+这个结构体是个好东西,它才是我们的关键,这里面用到了上面的那个结构体的指针,还有一个int ifc_len,你想到了什么?对,没错!ifc_len表示下面那个指针指向的内容有多长,指针么就是指向第一个struct ifreq的地方,我这里为什么要说是第一个呢,因为有了ifc_len,它还真可以变成好多个.如果你还没有理解的话,那我们画个图吧~
+
+    ifc_len = 4*sizeof(struct ifreq);
+	struct ifreq *ifcu_req
+	               |          -----------------
+	               |--------> |struct ifreq 1 |
+                              -----------------
+	                          |struct ifreq 2 |  <---------这个的地址是ifcu_req + sizeof(struct ifreq)
+                              -----------------
+	                          |struct ifreq 3 |  <---------这个的地址是ifcu_req + 2*sizeof(struct ifreq)
+                              -----------------
+	                          |struct ifreq 4 |  <---------这个的地址是ifcu_req + 3*sizeof(struct ifreq)
+                              -----------------
+
+所以,同理,通过,`ifc_len/sizeof(struct ifreq)` 我们就可以知道到底有几个interface了(千万不要以为你的系统里只有一个接口,一般你都会有俩~,一个是eth0或者wlan0,另一个是lo,当然不同的系统名字不一样,例如centos里可能是lo和ppp0什么的)
 
 ###拓展
 
