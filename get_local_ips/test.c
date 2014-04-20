@@ -13,24 +13,20 @@
 void getlocalhostip()
 {
 	int  MAXINTERFACES=16;
-	long ip;
-	int fd, intrface, retn = 0;
-	struct ifreq buf[MAXINTERFACES]; //if.h
-	struct ifconf ifc;				 //if.h
-	ip = -1;
+	int fd, interface = 0;
+	struct ifreq buf[MAXINTERFACES];         // if.h
+	struct ifconf ifc = {0};                 //if.h
 	if ((fd = socket (AF_INET, SOCK_DGRAM, 0)) >= 0) {
 		ifc.ifc_len = sizeof(buf);
 		ifc.ifc_buf = (caddr_t) buf;
 		if (!ioctl (fd, SIOCGIFCONF, (char *) &ifc)) {
-			intrface = ifc.ifc_len / sizeof (struct ifreq); 
-			printf("interface: %d\n\n", intrface);
-			while (intrface-- > 0) 	{
-				struct ifreq *ip = 0;
+			interface = ifc.ifc_len / sizeof (struct ifreq); 
+			printf("interface: %d\n\n", interface);
+			while (interface-- > 0) 	{
 				struct sockaddr_in *ip_addr = 0;
-				ip = ifc.ifc_req + intrface;
-				printf("ifreq 的地址是: %x\n", ip);
-				ip_addr = (struct sockaddr_in *)&(ip->ifr_addr);
-				printf("%s : %s\n", ip->ifr_name, inet_ntoa(ip_addr->sin_addr));
+				ip_addr = (struct sockaddr_in *)&(buf[interface].ifr_addr);
+				printf("%s : %s\n", buf[interface].ifr_name, 
+									inet_ntoa(ip_addr->sin_addr));
 			}
 		}
 		close (fd);
